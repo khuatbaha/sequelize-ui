@@ -28,6 +28,9 @@ import React from 'react'
 import { MY_SCHEMAS_ID } from './constants'
 import MySchemaLinks from './MySchemaLinks'
 import SchemasError from './SchemasError'
+import api from '@src/api/schema'
+import SaveIcon from '../../components/icons/Save'
+import FolderIcon from '../../components/icons/Folder'
 
 const SchemaStorageInfo = dynamic(() => import('./SchemaStorageInfo'))
 
@@ -58,16 +61,107 @@ export default function MySchemas(): React.ReactElement {
     }
   }
 
+  const handleClickExportSchema = async () => {
+    const schemas = await api.listSchemas()
+    downloadJSON(schemas, 'schemas.json')
+  }
+
+  const handleClickImportSchema = async () => {
+    uploadJSON(async (data: Schema | Schema[]) => {
+      if (data) {
+        if (Array.isArray(data)) {
+          data.forEach(async (schema) => {
+            try {
+              const found = schemas?.find((s) => s.name === schema.name)
+              if (found) {
+                schema.id = found.id // maintain ID for update
+                await api.updateSchema(schema)
+                console.log(`Update Schema "${schema.name}" "${schema.id}" successfully.`)
+              } else {
+                await api.createSchema(schema)
+                console.log(`Create Schema "${schema.name}" "${schema.id}"  successfully.`)
+              }
+            } catch (e) {
+              console.error(`Failed to import schema "${schema.name}" "${schema.id}".`, e)
+            }
+          })
+          success(`Schema imported successfully.`)
+          await refetch()
+        } else {
+          try {
+            const schema: Schema = data
+            const found = schemas?.find((s) => s.name === schema.name)
+            if (found) {
+              schema.id = found.id // maintain ID for update
+              await api.updateSchema(schema)
+              console.log(`Update Schema "${schema.name}" "${schema.id}" successfully.`)
+            } else {
+              await api.createSchema(schema)
+              console.log(`Create Schema "${schema.name}" "${schema.id}"  successfully.`)
+            }
+            await refetch()
+            success(`Schema "${schema.name}" "${schema.id}" imported successfully.`)
+          } catch (e) {
+            console.error(`Failed to import schema`, e)
+          }
+        }
+      } else {
+        console.log('Không tìm thấy "schema" trong file JSON!')
+      }
+    })
+  }
+
+  type SchemasStateProps = { schemas: Schema[]; onClickInfo: () => void }
+
+  function SchemasState({ schemas, onClickInfo }: SchemasStateProps): React.ReactElement {
+    return (
+      <>
+        <div className={classnames(flexCenterVertical, margin('mb-4'))}>
+          <h2 className={classnames(fontColor, fontSize('text-2xl'))}>My Schemas</h2>
+          <IconButton
+            className={classnames(margin('ml-1'))}
+            icon={InfoIcon}
+            iconProps={{ size: 5, strokeWidth: 2 }}
+            label="my schemas info"
+            onClick={onClickInfo}
+          />
+          <IconButton
+            className={classnames(margin('ml-1'), display('hidden', 'xs:inline-block'))}
+            label="import schema"
+            icon={SaveIcon}
+            iconProps={{
+              size: 6,
+            }}
+            onClick={handleClickImportSchema}
+          />
+          <IconButton
+            className={classnames(margin('ml-1'), display('hidden', 'xs:inline-block'))}
+            label="export schema"
+            icon={FolderIcon}
+            iconProps={{
+              size: 6,
+            }}
+            onClick={handleClickExportSchema}
+          />
+        </div>
+        <div className={classnames(flexCenter)}>
+          <MySchemaLinks schemas={schemas} />
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
       <div
         className={classnames(minHeight('min-h-26', 'xs:min-h-20', 'md:min-h-10'), width('w-full'))}
       >
         {!schemas && error && <SchemasError onClickClearData={handleClickClearData} />}
-        {schemas && schemas.length === 0 && <ZeroState onClickOpenInfo={openInfoModal} />}
-        {schemas && schemas.length > 0 && (
-          <SchemasState schemas={schemas} onClickInfo={openInfoModal} />
+        {false && schemas && schemas!.length === 0 && <ZeroState onClickOpenInfo={openInfoModal} />}
+        {false && schemas && schemas!.length > 0 && (
+          <SchemasState schemas={schemas!} onClickInfo={openInfoModal} />
         )}
+        {schemas && <SchemasState schemas={schemas} onClickInfo={openInfoModal} />}
       </div>
       <Modal
         id="my-schemas-info"
@@ -127,24 +221,38 @@ function ZeroState({ onClickOpenInfo }: ZeroStateProps): React.ReactElement {
   )
 }
 
-type SchemasStateProps = { schemas: Schema[]; onClickInfo: () => void }
+// ====== Web browser download/upload helper ======
+export function downloadJSON(schema: Schema | Schema[], filename = 'schema.json'): void {
+  const blob = new Blob([JSON.stringify(schema, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
 
-function SchemasState({ schemas, onClickInfo }: SchemasStateProps): React.ReactElement {
-  return (
-    <>
-      <div className={classnames(flexCenterVertical, margin('mb-4'))}>
-        <h2 className={classnames(fontColor, fontSize('text-2xl'))}>My Schemas</h2>
-        <IconButton
-          className={classnames(margin('ml-1'))}
-          icon={InfoIcon}
-          iconProps={{ size: 5, strokeWidth: 2 }}
-          label="my schemas info"
-          onClick={onClickInfo}
-        />
-      </div>
-      <div className={classnames(flexCenter)}>
-        <MySchemaLinks schemas={schemas} />
-      </div>
-    </>
-  )
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function uploadJSON(onLoad: (data: any) => void) {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'application/json'
+  input.style.display = 'none'
+  input.onchange = async (event: Event) => {
+    const target = event.target as HTMLInputElement
+    if (!target.files?.length) return
+    const file = target.files[0]
+    const text = await file.text()
+    try {
+      const data = JSON.parse(text)
+      onLoad(data)
+    } catch (err) {
+      console.error('Invalid JSON file:', err)
+    }
+    document.body.removeChild(input)
+  }
+  document.body.appendChild(input)
+  input.click()
 }
