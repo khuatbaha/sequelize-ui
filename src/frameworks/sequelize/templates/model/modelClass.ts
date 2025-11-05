@@ -240,7 +240,7 @@ type TableNameArgs = {
   dbOptions: DbOptions
 }
 function tableName({ dbOptions: { caseStyle, nounForm }, model }: TableNameArgs): string | null {
-  if (model?.tableName) return model.tableName
+  if (model.tableName) return model.tableName
   let tableName = model.name
   if (caseStyle === DbCaseStyle.Snake) {
     tableName = snakeCase(tableName)

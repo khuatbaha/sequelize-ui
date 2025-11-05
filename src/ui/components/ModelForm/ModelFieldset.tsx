@@ -27,6 +27,11 @@ function ModelFieldset({ model, errors, onChange }: ModelFieldsetProps): React.R
     [onChange],
   )
 
+  const handleChangeTimestamps = React.useCallback(
+    (timestamps: boolean) => onChange({ timestamps }),
+    [onChange],
+  )
+
   return (
     <fieldset
       className={classnames(
@@ -45,6 +50,8 @@ function ModelFieldset({ model, errors, onChange }: ModelFieldsetProps): React.R
           fixedErrorContainer
           onChange={handleChangeName}
         />
+      </div>
+      <div className={classnames(width('sm:w-1/2'))}>
         <TextInput
           id={modelTableNameId()}
           label="Table Name"
@@ -60,6 +67,14 @@ function ModelFieldset({ model, errors, onChange }: ModelFieldsetProps): React.R
           label="Soft delete"
           checked={model.softDelete}
           onChange={handleChangeSoftDelete}
+        />
+      </div>
+      <div className={classnames(width('sm:w-1/2'), margin('mb-4', 'sm:mb-0', 'sm:ml-4'))}>
+        <Checkbox
+          id={'model-timestamps'}
+          label="Timestamps"
+          checked={model.timestamps}
+          onChange={handleChangeTimestamps}
         />
       </div>
     </fieldset>

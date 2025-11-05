@@ -10,7 +10,7 @@ export {
   sentenceCase,
   snakeCase,
 } from 'change-case'
-export { singular as singularPl } from 'pluralize'
+export { singular as singular_ } from 'pluralize'
 
 // override to prevent wrong file/model name conversions
 export function singular(value: string): string {
@@ -19,6 +19,12 @@ export function singular(value: string): string {
 export function plural(value: string): string {
   return value
 }
+export function titleCase(value: string): string {
+  return value
+}
+// export function camelCase(value: string): string {
+//   return value
+// }
 
 export function _plural(value: string): string {
   const pluralized = plural_(value)
@@ -30,7 +36,7 @@ export function _plural(value: string): string {
   return pluralized === singularized ? `${singularized}s` : pluralized
 }
 
-export function titleCase(value: string): string {
+export function titleCase_(value: string): string {
   return noCase(value)
     .split(' ')
     .map((input) => sentenceCase(input))

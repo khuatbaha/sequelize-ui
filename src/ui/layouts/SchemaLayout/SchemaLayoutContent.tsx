@@ -91,6 +91,7 @@ export default function SchemaLayoutContent({
         <ModelView
           model={state.model}
           schema={schema}
+          updateModel={updateModel}
           onViewSchema={onViewSchema}
           onClickAddField={onClickAddField}
           onClickEditField={onClickEditField}

@@ -13,16 +13,32 @@ import {
 } from '@src/ui/styles/classnames'
 import { breakWords, panel, panelGrid, sectionWide, title } from '@src/ui/styles/utils'
 import { titleCase } from '@src/utils/string'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Breadcrumbs from '../Breadcrumbs'
 import PanelButton from '../form/PanelButton'
 import PlusCircleIcon from '../icons/Plus'
 import AssociationView from './AssociationView'
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable'
 import FieldView from './FieldView'
 
 type ModelViewProps = {
   schema: Schema
   model: Model
+  updateModel: (model: Model) => void
   onViewSchema: (model?: Model) => void
   onClickAddField: () => void
   onClickEditField: (field: Field) => void
@@ -35,6 +51,7 @@ type ModelViewProps = {
 export default function ModelView({
   schema,
   model,
+  updateModel,
   onViewSchema,
   onClickAddField,
   onClickEditField,
@@ -43,6 +60,29 @@ export default function ModelView({
   onClickEditAssociation,
   onClickDeleteAssociation,
 }: ModelViewProps): React.ReactElement {
+  const [fields, setFields] = useState(model.fields)
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over) return
+    if (active.id !== over?.id) {
+      const oldIndex = fields.findIndex((i) => i.id === active.id)
+      const newIndex = fields.findIndex((i) => i.id === over.id)
+      model.fields = arrayMove(fields, oldIndex, newIndex)
+      setFields(model.fields)
+      updateModel(model)
+      console.log(model.fields.map((f) => f.name))
+    }
+  }
+  useEffect(() => {
+    setFields(model.fields)
+  }, [model.fields])
+
   return (
     <div
       className={classnames(
@@ -69,24 +109,36 @@ export default function ModelView({
             <span className={classnames(margin('mr-2'))}>Soft Delete:</span>
             <pre>{model.softDelete.toString()}</pre>
           </li>
+          <li className={classnames(fontSize('text-base'), breakWords, display('flex'))}>
+            <span className={classnames(margin('mr-2'))}>timestamps:</span>
+            <pre>{model.timestamps.toString()}</pre>
+          </li>
         </ul>
       </div>
       <div className={classnames(sectionWide)}>
         <h3 className={classnames(title)}>Fields</h3>
 
-        <ul className={classnames(panelGrid)}>
-          {model.fields.map((field) => {
-            return (
-              <li key={field.id} className={classnames(panel)}>
-                <FieldView
-                  field={field}
-                  onClickEdit={onClickEditField.bind(null, field)}
-                  onClickDelete={onClickDeleteField.bind(null, field)}
-                />
-              </li>
-            )
-          })}
-          <li>
+        <div className={classnames(panelGrid)}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={fields} strategy={rectSortingStrategy}>
+              {fields.map((field) => {
+                return (
+                  <FieldView
+                    key={field.id}
+                    field={field}
+                    className={panel}
+                    onClickEdit={onClickEditField.bind(null, field)}
+                    onClickDelete={onClickDeleteField.bind(null, field)}
+                  />
+                )
+              })}
+            </SortableContext>
+          </DndContext>
+          <div>
             <PanelButton
               label="Add Field"
               className={classnames(
@@ -96,8 +148,8 @@ export default function ModelView({
               iconProps={{ size: 6 }}
               onClick={onClickAddField}
             />
-          </li>
-        </ul>
+          </div>
+        </div>
       </div>
       <div className={classnames(sectionWide)}>
         <h3 className={classnames(title, margin('mt-6'))}>Associations</h3>
