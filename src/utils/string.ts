@@ -16,8 +16,11 @@ export { singular as singularPl } from 'pluralize'
 export function singular(value: string): string {
   return value
 }
-
 export function plural(value: string): string {
+  return value
+}
+
+export function _plural(value: string): string {
   const pluralized = plural_(value)
   const singularized = singular(value)
   // If a word's plural form is the same as the singular form, add an 's' to ensure uniqueness
