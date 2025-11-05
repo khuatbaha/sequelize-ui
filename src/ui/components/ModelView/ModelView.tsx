@@ -62,6 +62,10 @@ export default function ModelView({
         </h2>
         <ul className={classnames(margin('mb-11'))}>
           <li className={classnames(fontSize('text-base'), breakWords, display('flex'))}>
+            <span className={classnames(margin('mr-2'))}>tableName:</span>
+            <pre>{model?.tableName ? model.tableName : model.name}</pre>
+          </li>
+          <li className={classnames(fontSize('text-base'), breakWords, display('flex'))}>
             <span className={classnames(margin('mr-2'))}>Soft Delete:</span>
             <pre>{model.softDelete.toString()}</pre>
           </li>

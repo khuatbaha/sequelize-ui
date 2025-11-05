@@ -28,6 +28,7 @@ import {
 
 export type ModelErrors = {
   name?: string
+  tableName?: string
   fields: { [id: string]: FieldErrors }
   associations: { [id: string]: AssociationErrors }
 }
@@ -45,6 +46,7 @@ export type AssociationErrors = {
 
 export const emptyModelErrors: ModelErrors = Object.freeze({
   name: undefined,
+  tableName: undefined,
   fields: {},
   associations: {},
 })

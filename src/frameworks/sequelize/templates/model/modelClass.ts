@@ -240,8 +240,15 @@ type TableNameArgs = {
   dbOptions: DbOptions
 }
 function tableName({ dbOptions: { caseStyle, nounForm }, model }: TableNameArgs): string | null {
-  if (nounForm === DbNounForm.Singular && caseStyle === DbCaseStyle.Snake) {
-    return `tableName: '${singular(snakeCase(model.name))}'`
+  if (model?.tableName) return model.tableName
+  let tableName = model.name
+  if (caseStyle === DbCaseStyle.Snake) {
+    tableName = snakeCase(tableName)
   }
-  return null
+  if (nounForm === DbNounForm.Singular) {
+    tableName = singular(tableName)
+  } else {
+    tableName = plural(tableName)
+  }
+  return `tableName: '${tableName}'`
 }

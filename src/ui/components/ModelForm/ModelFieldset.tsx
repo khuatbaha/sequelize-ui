@@ -17,6 +17,10 @@ function ModelFieldset({ model, errors, onChange }: ModelFieldsetProps): React.R
     (name?: string) => onChange({ name: name || '' }),
     [onChange],
   )
+  const handleChangeTableName = React.useCallback(
+    (tableName?: string) => onChange({ tableName: tableName || '' }),
+    [onChange],
+  )
 
   const handleChangeSoftDelete = React.useCallback(
     (softDelete: boolean) => onChange({ softDelete }),
@@ -41,6 +45,14 @@ function ModelFieldset({ model, errors, onChange }: ModelFieldsetProps): React.R
           fixedErrorContainer
           onChange={handleChangeName}
         />
+        <TextInput
+          id={modelTableNameId()}
+          label="Table Name"
+          value={model.tableName}
+          error={errors.tableName}
+          fixedErrorContainer
+          onChange={handleChangeTableName}
+        />
       </div>
       <div className={classnames(width('sm:w-1/2'), margin('mb-4', 'sm:mb-0', 'sm:ml-4'))}>
         <Checkbox
@@ -56,6 +68,9 @@ function ModelFieldset({ model, errors, onChange }: ModelFieldsetProps): React.R
 
 export function modelNameId(): string {
   return 'model-name'
+}
+export function modelTableNameId(): string {
+  return 'table-name'
 }
 
 export default React.memo(ModelFieldset)

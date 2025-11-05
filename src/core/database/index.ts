@@ -186,9 +186,9 @@ export const defaultDbOptions: DbOptions = {
   sqlDialect: SqlDialect.Postgres,
   prefixPks: null,
   timestamps: true,
-  caseStyle: DbCaseStyle.Snake,
-  nounForm: DbNounForm.Plural,
-  migrations: true,
+  caseStyle: DbCaseStyle.Camel,
+  nounForm: DbNounForm.Singular,
+  migrations: false,
 }
 
 export function caseByDbCaseStyle(value: string, caseStyle: DbCaseStyle): string {

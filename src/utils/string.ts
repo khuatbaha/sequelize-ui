@@ -1,6 +1,6 @@
 import { noCase, sentenceCase } from 'change-case'
 import { nanoid } from 'nanoid'
-import { plural as plural_, singular } from 'pluralize'
+import { plural as plural_ } from 'pluralize'
 
 export {
   camelCase,
@@ -10,7 +10,12 @@ export {
   sentenceCase,
   snakeCase,
 } from 'change-case'
-export { singular } from 'pluralize'
+export { singular as singularPl } from 'pluralize'
+
+// override to prevent wrong file/model name conversions
+export function singular(value: string): string {
+  return value
+}
 
 export function plural(value: string): string {
   const pluralized = plural_(value)
