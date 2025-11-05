@@ -1,3 +1,4 @@
+import schemaApi from '@src/api/schema'
 import { SchemaMeta } from '@src/api/meta'
 import { DbOptions } from '@src/core/database'
 import * as FileTree from '@src/core/files/fileTree'
@@ -26,9 +27,15 @@ import CloseIcon from '../../components/icons/Close'
 import FloppyDiscIcon from '../../components/icons/FloppyDisc'
 import PencilIcon from '../../components/icons/Pencil'
 import TrashIcon from '../../components/icons/Trash'
+import SaveIcon from '../../components/icons/Save'
+import FolderIcon from '../../components/icons/Folder'
 import CodeViewerControls from './CodeViewerControls'
 import SchemaCodeToggle from './SchemaCodeToggle'
 import { SchemaLayoutState, SchemaLayoutStateType } from './types'
+import useAsync from '@src/ui/hooks/useAsync'
+import { Schema } from '@src/core/schema'
+import { downloadJSON, uploadJSON } from '../HomeLayout/MySchemas'
+import { useAlert } from '@src/ui/lib/alert'
 
 type SchemaLayoutControlsProps = {
   state: SchemaLayoutState
@@ -118,6 +125,65 @@ function SchemaLayoutControlsActions({
   onSave,
   onClose,
 }: SchemaLayoutControlsActionsProps): React.ReactElement | null {
+  const { data: schemas, refetch } = useAsync({ getData: schemaApi.listSchemas })
+  const { success } = useAlert()
+  const handleClickExportSchema = async () => {
+    if (!('schema' in state) || !state.schema) {
+      return
+    }
+    downloadJSON(state.schema as Schema, state.schema.name + '.json')
+  }
+
+  const handleClickImportSchema = async () => {
+    uploadJSON(async (data: Schema | Schema[]) => {
+      if (data) {
+        if (Array.isArray(data)) {
+          data.forEach(async (schema) => {
+            try {
+              const found = schemas?.find((s) => s.name === schema.name)
+              if (found) {
+                schema.id = found.id // maintain ID for update
+                await schemaApi.updateSchema(schema)
+                console.log(`Update Schema "${schema.name}" "${schema.id}" successfully.`)
+              } else {
+                await schemaApi.createSchema(schema)
+                console.log(`Create Schema "${schema.name}" "${schema.id}"  successfully.`)
+              }
+            } catch (e) {
+              console.error(`Failed to import schema "${schema.name}" "${schema.id}".`, e)
+            }
+          })
+          success(`Schema imported successfully.`)
+          await refetch()
+        } else {
+          try {
+            const schema: Schema = data
+            const found = schemas?.find((s) => s.name === schema.name)
+            if (found) {
+              schema.id = found.id // maintain ID for update
+              await schemaApi.updateSchema(schema)
+              console.log(`Update Schema "${schema.name}" "${schema.id}" successfully.`)
+            } else {
+              await schemaApi.createSchema(schema)
+              console.log(`Create Schema "${schema.name}" "${schema.id}"  successfully.`)
+            }
+            await refetch()
+            success(`Schema "${schema.name}" "${schema.id}" imported successfully.`)
+          } catch (e) {
+            console.error(`Failed to import schema`, e)
+          }
+        }
+        if ('schema' in state) {
+          const newSchema = schemas?.find((s) => s.name === state.schema.name) || state.schema
+          if (newSchema) {
+            state.schema = newSchema
+          }
+        }
+      } else {
+        console.log('Không tìm thấy "schema" trong file JSON!')
+      }
+    })
+  }
   if (state.type === SchemaLayoutStateType.CODE) {
     return (
       <CodeViewerControls
@@ -142,13 +208,29 @@ function SchemaLayoutControlsActions({
           onClick={onClose}
         />
         {!meta?.isExample && (
-          <IconButton
-            className={classnames(iconButtonMargin, display('hidden', '2xs:inline-block'))}
-            label="delete schema"
-            icon={TrashIcon}
-            iconProps={{ size: 6 }}
-            onClick={onDelete}
-          />
+          <>
+            <IconButton
+              className={classnames(iconButtonMargin, display('hidden', '2xs:inline-block'))}
+              label="import schema"
+              icon={SaveIcon}
+              iconProps={{ size: 6 }}
+              onClick={handleClickImportSchema}
+            />
+            <IconButton
+              className={classnames(iconButtonMargin, display('hidden', '2xs:inline-block'))}
+              label="export schema"
+              icon={FolderIcon}
+              iconProps={{ size: 6 }}
+              onClick={handleClickExportSchema}
+            />
+            <IconButton
+              className={classnames(iconButtonMargin, display('hidden', '2xs:inline-block'))}
+              label="delete schema"
+              icon={TrashIcon}
+              iconProps={{ size: 6 }}
+              onClick={onDelete}
+            />
+          </>
         )}
         <IconButton
           className={classnames(iconButtonMargin, display('hidden', '2xs:inline-block'))}

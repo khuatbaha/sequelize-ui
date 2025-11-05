@@ -28,7 +28,6 @@ import React from 'react'
 import { MY_SCHEMAS_ID } from './constants'
 import MySchemaLinks from './MySchemaLinks'
 import SchemasError from './SchemasError'
-import api from '@src/api/schema'
 import SaveIcon from '../../components/icons/Save'
 import FolderIcon from '../../components/icons/Folder'
 
@@ -62,7 +61,7 @@ export default function MySchemas(): React.ReactElement {
   }
 
   const handleClickExportSchema = async () => {
-    const schemas = await api.listSchemas()
+    const schemas = await schemaApi.listSchemas()
     downloadJSON(schemas, 'schemas.json')
   }
 
@@ -75,10 +74,10 @@ export default function MySchemas(): React.ReactElement {
               const found = schemas?.find((s) => s.name === schema.name)
               if (found) {
                 schema.id = found.id // maintain ID for update
-                await api.updateSchema(schema)
+                await schemaApi.updateSchema(schema)
                 console.log(`Update Schema "${schema.name}" "${schema.id}" successfully.`)
               } else {
-                await api.createSchema(schema)
+                await schemaApi.createSchema(schema)
                 console.log(`Create Schema "${schema.name}" "${schema.id}"  successfully.`)
               }
             } catch (e) {
@@ -93,10 +92,10 @@ export default function MySchemas(): React.ReactElement {
             const found = schemas?.find((s) => s.name === schema.name)
             if (found) {
               schema.id = found.id // maintain ID for update
-              await api.updateSchema(schema)
+              await schemaApi.updateSchema(schema)
               console.log(`Update Schema "${schema.name}" "${schema.id}" successfully.`)
             } else {
-              await api.createSchema(schema)
+              await schemaApi.createSchema(schema)
               console.log(`Create Schema "${schema.name}" "${schema.id}"  successfully.`)
             }
             await refetch()
