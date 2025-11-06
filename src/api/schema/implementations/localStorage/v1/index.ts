@@ -216,6 +216,8 @@ export interface Model {
   name: string
   updatedAt: string
   softDelete?: boolean
+  timestamps?: boolean
+  tableName?: string
 }
 
 export interface Schema {

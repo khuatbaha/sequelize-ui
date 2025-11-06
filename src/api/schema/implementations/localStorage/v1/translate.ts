@@ -76,6 +76,8 @@ function toV1Model(model: Model): ModelV1 {
     id: model.id,
     name: model.name,
     softDelete: model.softDelete,
+    tableName: model.tableName,
+    timestamps: model.timestamps,
     createdAt: model.createdAt,
     updatedAt: model.updatedAt,
     fields: model.fields.map(toV1Field),

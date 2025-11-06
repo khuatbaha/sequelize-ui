@@ -20,6 +20,7 @@ export type Model = {
   tableName: string
   softDelete: boolean
   timestamps: boolean
+  hasId: boolean
   fields: Field[]
   associations: Association[]
   createdAt: string
@@ -59,6 +60,7 @@ export function emptyModel(): Model {
     tableName: '',
     softDelete: false,
     timestamps: true,
+    hasId: true,
     fields: [],
     associations: [],
     createdAt: time,

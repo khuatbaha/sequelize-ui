@@ -90,6 +90,7 @@ export function modelClassTemplate({
                 'sequelize',
                 tableName({ model, dbOptions }),
                 model.softDelete ? 'paranoid: true' : null,
+                `timestamps: ${model.timestamps ? 'true' : 'false'}`,
               ],
               {
                 depth: 2,
@@ -240,7 +241,7 @@ type TableNameArgs = {
   dbOptions: DbOptions
 }
 function tableName({ dbOptions: { caseStyle, nounForm }, model }: TableNameArgs): string | null {
-  if (model.tableName) return model.tableName
+  if (model.tableName) return `tableName: '${model.tableName}'`
   let tableName = model.name
   if (caseStyle === DbCaseStyle.Snake) {
     tableName = snakeCase(tableName)

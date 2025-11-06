@@ -240,5 +240,10 @@ export function getTimestampFields({ model, dbOptions }: GetTimestampFieldsTempl
       })
     : null
 
-  return [createdAt, updatedAt, deletedAt].filter((f): f is Field => !!f)
+  return [
+    !model.timestamps ? null : createdAt,
+    !model.timestamps ? null : updatedAt,
+    deletedAt,
+  ].filter((f): f is Field => !!f)
+  // return [createdAt, updatedAt, deletedAt].filter((f): f is Field => !!f)
 }

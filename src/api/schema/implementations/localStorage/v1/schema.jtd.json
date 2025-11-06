@@ -20,7 +20,6 @@
     "model": {
       "additionalProperties": true,
       "properties": {
-        "id": { "type": "string" },
         "name": { "type": "string" },
         "updatedAt": { "type": "timestamp" },
         "createdAt": { "type": "timestamp" },
@@ -28,7 +27,10 @@
         "associations": { "elements": { "ref": "association" } }
       },
       "optionalProperties": {
-        "softDelete": { "type": "boolean" }
+        "id": { "type": "string" },
+        "softDelete": { "type": "boolean" },
+        "timestamps": { "type": "boolean" },
+        "tableName": { "type": "string" }
       }
     },
     "field": {
