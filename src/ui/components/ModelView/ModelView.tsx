@@ -13,7 +13,7 @@ import {
 } from '@src/ui/styles/classnames'
 import { breakWords, panel, panelGrid, sectionWide, title } from '@src/ui/styles/utils'
 import { titleCase } from '@src/utils/string'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Breadcrumbs from '../Breadcrumbs'
 import PanelButton from '../form/PanelButton'
 import PlusCircleIcon from '../icons/Plus'
@@ -38,7 +38,7 @@ import FieldView from './FieldView'
 type ModelViewProps = {
   schema: Schema
   model: Model
-  updateModel: (model: Model) => void
+  onChange: (model: Model) => void
   onViewSchema: (model?: Model) => void
   onClickAddField: () => void
   onClickEditField: (field: Field) => void
@@ -51,7 +51,7 @@ type ModelViewProps = {
 export default function ModelView({
   schema,
   model,
-  updateModel,
+  onChange,
   onViewSchema,
   onClickAddField,
   onClickEditField,
@@ -61,6 +61,16 @@ export default function ModelView({
   onClickDeleteAssociation,
 }: ModelViewProps): React.ReactElement {
   const [fields, setFields] = useState(model.fields)
+  // const handleChangeModel = React.useCallback(
+  //   (changes: Partial<Model>) => {
+  //     onChange({ ...model, ...changes })
+  //     console.log(
+  //       'handleChangeModel',
+  //       changes.fields?.map((f) => f.name),
+  //     )
+  //   },
+  //   [model, onChange],
+  // )
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -73,15 +83,21 @@ export default function ModelView({
     if (active.id !== over?.id) {
       const oldIndex = fields.findIndex((i) => i.id === active.id)
       const newIndex = fields.findIndex((i) => i.id === over.id)
-      model.fields = arrayMove(fields, oldIndex, newIndex)
-      setFields(model.fields)
-      updateModel(model)
-      console.log(model.fields.map((f) => f.name))
+      const _fields = arrayMove(fields, oldIndex, newIndex)
+      setFields(_fields)
+      // model.fields = _fields
+      onChange({ ...model, fields: _fields })
+      // console.log(
+      //   'DragEnd',
+      //   _fields.map((f) => f.name),
+      //   model.fields.map((f) => f.name),
+      // )
     }
   }
-  useEffect(() => {
-    setFields(model.fields)
-  }, [model.fields])
+
+  // useEffect(() => {
+  //   console.log(model.fields.map((f) => f.name))
+  // }, [model.fields])
 
   return (
     <div

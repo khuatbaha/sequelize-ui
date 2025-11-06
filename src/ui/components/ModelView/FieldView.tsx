@@ -55,7 +55,7 @@ function FieldView({ field, onClickEdit, onClickDelete, className }: FieldViewPr
           className={classnames(padding('px-1'), fontWeight('font-bold'), breakWordsMinus8)}
         >
           {/* {noCase(field.name)} */}
-          {field.name}
+          ⋮⋮ {field.name}
         </p>
         <ActionMenu
           className={classnames(position('absolute'), inset('right-0', 'top-1', 'right-1'))}

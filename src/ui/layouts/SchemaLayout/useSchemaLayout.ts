@@ -166,7 +166,10 @@ export function useSchemaLayout({
 
   const updateSchema = React.useCallback(
     (schema: Schema) => {
-      if (state.type === SchemaLayoutStateType.EDIT_SCHEMA) {
+      if (
+        state.type === SchemaLayoutStateType.EDIT_SCHEMA ||
+        state.type === SchemaLayoutStateType.VIEW_SCHEMA
+      ) {
         setState({ ...state, schema })
       }
     },
@@ -175,7 +178,10 @@ export function useSchemaLayout({
 
   const updateModel = React.useCallback(
     (model: Model) => {
-      if (state.type === SchemaLayoutStateType.EDIT_MODEL) {
+      if (
+        state.type === SchemaLayoutStateType.EDIT_MODEL ||
+        state.type === SchemaLayoutStateType.VIEW_MODEL
+      ) {
         setState({ ...state, model })
       }
     },

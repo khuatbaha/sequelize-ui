@@ -31,6 +31,7 @@ import {
   margin,
   padding,
   position,
+  width,
 } from '@src/ui/styles/classnames'
 import { fieldsetGrid } from '@src/ui/styles/utils'
 import { dedup } from '@src/utils/array'
@@ -208,6 +209,7 @@ function FieldFieldset({ field, errors, onChange, onDelete }: FieldFieldsetProps
 
   return (
     <fieldset className={classnames(fieldsetGrid)}>
+      <div className={classnames(width('w-full'))}>⋮⋮ {field.name || '<new Field>'}</div>
       <IconButton
         className={classnames(position('absolute'), inset('top-0', 'right-0'), padding('p-1'))}
         label="delete"
