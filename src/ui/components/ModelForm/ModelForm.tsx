@@ -155,7 +155,7 @@ export default function ModelForm({
       {...autofillDisable}
     >
       <div className={classnames(sectionWide)}>
-        <h2 className={classnames(title)}>Model</h2>
+        <h2 className={classnames(title)}>Model edit: {model.name}</h2>
         <ModelFieldset model={model} onChange={handleChangeModel} errors={errors} />
       </div>
       <div className={classnames(sectionWide, margin('mb-6'))}>

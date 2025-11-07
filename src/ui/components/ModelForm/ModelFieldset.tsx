@@ -41,7 +41,7 @@ function ModelFieldset({ model, errors, onChange }: ModelFieldsetProps): React.R
         alignItems('sm:items-center'),
       )}
     >
-      <div className={classnames(width('sm:w-1/2'))}>
+      <div className={classnames(width('sm:w-1/3'), margin('mr-2'))}>
         <TextInput
           id={modelNameId()}
           label="Name"
@@ -51,7 +51,7 @@ function ModelFieldset({ model, errors, onChange }: ModelFieldsetProps): React.R
           onChange={handleChangeName}
         />
       </div>
-      <div className={classnames(width('sm:w-1/2'))}>
+      <div className={classnames(width('sm:w-1/3'), margin('mr-2'))}>
         <TextInput
           id={modelTableNameId()}
           label="Table Name"
@@ -61,7 +61,7 @@ function ModelFieldset({ model, errors, onChange }: ModelFieldsetProps): React.R
           onChange={handleChangeTableName}
         />
       </div>
-      <div className={classnames(width('sm:w-1/2'), margin('mb-4', 'sm:mb-0', 'sm:ml-4'))}>
+      <div className={classnames(width('sm:w-1/4'), margin('mb-4', 'sm:mb-0', 'sm:ml-4'))}>
         <Checkbox
           id={'model-soft-delete'}
           label="Soft delete"
@@ -69,7 +69,7 @@ function ModelFieldset({ model, errors, onChange }: ModelFieldsetProps): React.R
           onChange={handleChangeSoftDelete}
         />
       </div>
-      <div className={classnames(width('sm:w-1/2'), margin('mb-4', 'sm:mb-0', 'sm:ml-4'))}>
+      <div className={classnames(width('sm:w-1/4'), margin('mb-4', 'sm:mb-0', 'sm:ml-4'))}>
         <Checkbox
           id={'model-timestamps'}
           label="Timestamps"

@@ -97,7 +97,7 @@ function SchemaView({
     >
       <Breadcrumbs items={[]} current={`${titleCase(schema.name)} (schema)`} />
       <div className={classnames(sectionWide)}>
-        <h2 className={classnames(title)}>Schema</h2>
+        <h2 className={classnames(title)}>Schema detail</h2>
         <div className={classnames(margin('mb-11'))}>
           <p className={classnames(fontSize('text-lg'), breakWords)}>
             Name: {titleCase(schema.name)}
@@ -106,7 +106,7 @@ function SchemaView({
       </div>
       <div className={classnames(sectionWide)}>
         <h3 className={classnames(subtitle)}>Models</h3>
-        <ul className={classnames(panelGrid)}>
+        <div className={classnames(panelGrid)}>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -125,7 +125,7 @@ function SchemaView({
               ))}
             </SortableContext>
           </DndContext>
-          <li>
+          <div>
             <PanelButton
               className={classnames(
                 backgroundColor(
@@ -137,8 +137,8 @@ function SchemaView({
               iconProps={{ size: 6 }}
               onClick={onClickAddModel}
             />
-          </li>
-        </ul>
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -165,7 +165,7 @@ function DragableSchemaView({
     transition,
   }
   return (
-    <li
+    <div
       id={model.id}
       ref={setNodeRef}
       style={style}
@@ -173,19 +173,23 @@ function DragableSchemaView({
       className={className as TTailwindString}
     >
       <h3
-        ref={setActivatorNodeRef}
-        {...listeners}
         tabIndex={-1}
         className={classnames(
           breakWordsMinus8,
           textAlign('text-left'),
-          textDecoration('hover:underline'),
           padding('px-1.5'),
           fontSize('text-lg'),
         )}
-        // onClick={onClickModel.bind(null, model)}
       >
-        ⋮⋮ {titleCase(model.name)}
+        <strong className={classnames(margin('mr-2'))} ref={setActivatorNodeRef} {...listeners}>
+          ⋮⋮
+        </strong>
+        <span
+          className={classnames(textDecoration('hover:underline'))}
+          onClick={onClickModel.bind(null, model)}
+        >
+          {titleCase(model.name)}
+        </span>
       </h3>
       <div className={classnames(display('flex'))}>
         <ActionMenu
@@ -208,7 +212,7 @@ function DragableSchemaView({
           ]}
         />
       </div>
-    </li>
+    </div>
   )
 }
 

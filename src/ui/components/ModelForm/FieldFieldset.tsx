@@ -33,7 +33,6 @@ import {
   position,
   width,
 } from '@src/ui/styles/classnames'
-import { fieldsetGrid } from '@src/ui/styles/utils'
 import { dedup } from '@src/utils/array'
 import React from 'react'
 import IconButton from '../form/IconButton'
@@ -208,10 +207,19 @@ function FieldFieldset({ field, errors, onChange, onDelete }: FieldFieldsetProps
   const handleDelete = React.useCallback(() => onDelete(field.id), [onDelete, field.id])
 
   return (
-    <fieldset className={classnames(fieldsetGrid)}>
-      <div className={classnames(width('w-full'))}>⋮⋮ {field.name || '<new Field>'}</div>
+    <fieldset
+      className={classnames(
+        padding('p-3'),
+        display('flex'),
+        flexDirection('flex-col'),
+        position('relative'),
+      )}
+    >
+      <h3 className={classnames(width('w-full'), padding('pb-2'))}>
+        ⋮⋮ {field.name || '<new Field>'}
+      </h3>
       <IconButton
-        className={classnames(position('absolute'), inset('top-0', 'right-0'), padding('p-1'))}
+        className={classnames(position('absolute'), inset('top-0', 'right-0'), padding('p-3'))}
         label="delete"
         icon={TrashIcon}
         iconProps={{ size: 6 }}

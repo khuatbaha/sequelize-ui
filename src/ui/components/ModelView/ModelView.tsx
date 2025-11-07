@@ -113,23 +113,21 @@ export default function ModelView({
         current={`${model && titleCase(model.name)} (model)`}
       />
       <div className={classnames(sectionWide)}>
-        <h2 className={classnames(title)}>
-          <pre>{titleCase(model.name)}</pre>
-        </h2>
-        <ul className={classnames(margin('mb-11'))}>
-          <li className={classnames(fontSize('text-base'), breakWords, display('flex'))}>
+        <h2 className={classnames(title)}>Model: {titleCase(model.name)}</h2>
+        <div className={classnames(margin('mb-11'))}>
+          <p className={classnames(fontSize('text-base'), breakWords, display('flex'))}>
             <span className={classnames(margin('mr-2'))}>tableName:</span>
             <pre>{model?.tableName ? model.tableName : model.name}</pre>
-          </li>
-          <li className={classnames(fontSize('text-base'), breakWords, display('flex'))}>
+          </p>
+          <p className={classnames(fontSize('text-base'), breakWords, display('flex'))}>
             <span className={classnames(margin('mr-2'))}>Soft Delete:</span>
             <pre>{model.softDelete.toString()}</pre>
-          </li>
-          <li className={classnames(fontSize('text-base'), breakWords, display('flex'))}>
+          </p>
+          <p className={classnames(fontSize('text-base'), breakWords, display('flex'))}>
             <span className={classnames(margin('mr-2'))}>timestamps:</span>
             <pre>{model.timestamps.toString()}</pre>
-          </li>
-        </ul>
+          </p>
+        </div>
       </div>
       <div className={classnames(sectionWide)}>
         <h3 className={classnames(title)}>Fields</h3>
@@ -170,9 +168,9 @@ export default function ModelView({
       <div className={classnames(sectionWide)}>
         <h3 className={classnames(title, margin('mt-6'))}>Associations</h3>
 
-        <ul className={panelGrid}>
+        <div className={panelGrid}>
           {model.associations.map((association) => (
-            <li key={association.id} className={classnames(panel, minHeight('min-h-22'))}>
+            <div key={association.id} className={classnames(panel, minHeight('min-h-22'))}>
               <AssociationView
                 association={association}
                 schema={schema}
@@ -180,9 +178,9 @@ export default function ModelView({
                 onClickEdit={onClickEditAssociation.bind(null, association)}
                 onClickDelete={onClickDeleteAssociation.bind(null, association)}
               />
-            </li>
+            </div>
           ))}
-          <li>
+          <div>
             <PanelButton
               label="Add association"
               className={classnames(
@@ -192,8 +190,8 @@ export default function ModelView({
               iconProps={{ size: 6 }}
               onClick={onClickAddAssociation}
             />
-          </li>
-        </ul>
+          </div>
+        </div>
       </div>
     </div>
   )

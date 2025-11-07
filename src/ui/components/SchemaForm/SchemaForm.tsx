@@ -2,13 +2,15 @@ import { emptyModel, Model, Schema } from '@src/core/schema'
 import { SchemaErrors } from '@src/core/validation/schema'
 import usePrevious from '@src/ui/hooks/usePrevious'
 import {
-  alignSelf,
   backgroundColor,
   classnames,
   display,
+  flexDirection,
   height,
+  inset,
   overflow,
   padding,
+  position,
   toClassname,
   width,
 } from '@src/ui/styles/classnames'
@@ -91,7 +93,7 @@ function SchemaForm({ schema, newModel, errors, onChange }: SchemaFormProps): Re
       {...autofillDisable}
     >
       <div className={classnames(sectionWide)}>
-        <h2 className={classnames(title)}>Schema</h2>
+        <h2 className={classnames(title)}>Schema edit</h2>
         <div className={classnames(width('sm:w-1/2'))}>
           <TextInput
             id={schemaNameId()}
@@ -107,10 +109,21 @@ function SchemaForm({ schema, newModel, errors, onChange }: SchemaFormProps): Re
         <h3 className={classnames(subtitle)}>Models</h3>
         <ul className={classnames(panelGrid)}>
           {schema.models.map((m) => (
-            <li key={m.id} className={classnames(panel, display('flex'), padding('p-1', 'pl-4'))}>
+            <li
+              key={m.id}
+              className={classnames(
+                panel,
+                display('flex'),
+                flexDirection('flex-col'),
+                padding('p-2'),
+                position('relative'),
+              )}
+            >
+              <h3 className={classnames(padding('p-1'))}>{m.name}</h3>
+
               <TextInput
                 id={modelNameId(m)}
-                className={classnames(padding('pt-4'))}
+                className={classnames(padding('pt-1'))}
                 label="Name"
                 error={errors.models[m.id]?.name}
                 fixedErrorContainer
@@ -119,7 +132,7 @@ function SchemaForm({ schema, newModel, errors, onChange }: SchemaFormProps): Re
               />
 
               <IconButton
-                className={classnames(alignSelf('self-start'))}
+                className={classnames(position('absolute'), inset('right-0', 'top-1', 'right-1'))}
                 label="delete modal"
                 icon={TrashIcon}
                 iconProps={{ size: 6 }}

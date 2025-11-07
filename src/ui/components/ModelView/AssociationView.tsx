@@ -18,7 +18,7 @@ import {
   toClassname,
 } from '@src/ui/styles/classnames'
 import { breakWordsMinus8, inlineButton, list, panelHeader } from '@src/ui/styles/utils'
-import { noCase, titleCase } from '@src/utils/string'
+import { titleCase } from '@src/utils/string'
 import React from 'react'
 import PencilIcon from '../icons/Pencil'
 import TrashIcon from '../icons/Trash'
@@ -80,23 +80,23 @@ function AssociationView({
           />
         </div>
         {(association.alias || association.foreignKey || isManytoMany(association)) && (
-          <ul className={classnames(list, padding('p-2', 'pl-4'))}>
-            {association.alias && <li>as {noCase(association.alias)}</li>}
-            {association.foreignKey && <li>Foreign key: {noCase(association.foreignKey)}</li>}
+          <div className={classnames(list, padding('p-2', 'pl-0'))}>
+            {association.alias && <p>as {association.alias}</p>}
+            {association.foreignKey && <p>Foreign key: {association.foreignKey}</p>}
             {isManytoMany(association) && (
-              <li>
+              <p>
                 through{' '}
                 <ThroughView
                   through={association.type.through}
                   schema={schema}
                   onClickModel={onClickModel}
                 />
-              </li>
+              </p>
             )}
             {isManytoMany(association) && association.type.targetFk && (
-              <li>Target foreign key: {noCase(association.type.targetFk)}</li>
+              <p>Target foreign key: {association.type.targetFk}</p>
             )}
-          </ul>
+          </div>
         )}
       </>
     )

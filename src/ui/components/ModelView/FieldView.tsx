@@ -6,12 +6,14 @@ import {
   inset,
   justifyContent,
   margin,
+  overflow,
   padding,
   position,
+  textOverflow,
   toClassname,
   TTailwindString,
 } from '@src/ui/styles/classnames'
-import { breakWordsMinus8, list, panelHeader } from '@src/ui/styles/utils'
+import { breakWordsMinus8, panelHeader } from '@src/ui/styles/utils'
 import React from 'react'
 import PencilIcon from '../icons/Pencil'
 import TrashIcon from '../icons/Trash'
@@ -65,22 +67,29 @@ function FieldView({ field, onClickEdit, onClickDelete, className }: FieldViewPr
           ]}
         />
       </div>
-      <ul className={classnames(list, padding('p-2', 'pl-4'))}>
-        <li>{displayDataType(field.type)}</li>
-        {field.primaryKey && <li>Primary key</li>}
-        {field.required && <li>Required</li>}
-        {field.unique && <li>Unique</li>}
+      <div
+        className={classnames(
+          padding('p-2'),
+          overflow('overflow-hidden'),
+          textOverflow('text-ellipsis'),
+        )}
+        onClick={onClickEdit}
+      >
+        <p>{displayDataType(field.type)}</p>
+        {field.primaryKey && <p>Primary key</p>}
+        {field.required && <p>Required</p>}
+        {field.unique && <p>Unique</p>}
         {defaultValue && (
-          <li>
+          <p className={classnames(overflow('overflow-hidden'), textOverflow('text-ellipsis'))}>
             <span className={classnames(display('flex'))}>
               Default:{' '}
-              <pre className={classnames(margin('ml-1'), toClassname('pt-[0.5px]'))}>
+              <span className={classnames(margin('ml-1'), toClassname('pt-[0.5px]'))}>
                 {defaultValue}
-              </pre>
+              </span>
             </span>
-          </li>
+          </p>
         )}
-      </ul>
+      </div>
     </div>
   )
 }
