@@ -10,7 +10,7 @@ export {
   sentenceCase,
   snakeCase,
 } from 'change-case'
-export { singular as singular_ } from 'pluralize'
+export { plural as plural_, singular as singular_ } from 'pluralize'
 
 // override to prevent wrong file/model name conversions
 export function singular(value: string): string {

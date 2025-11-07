@@ -1,7 +1,15 @@
 import { blank, lines } from '@src/core/codegen'
 import { DbCaseStyle, DbNounForm, DbOptions } from '@src/core/database'
 import { Association, AssociationTypeType, Field, Model, integerDataType } from '@src/core/schema'
-import { camelCase, pascalCase, plural, singular, snakeCase } from '@src/utils/string'
+import {
+  camelCase,
+  pascalCase,
+  plural,
+  plural_,
+  singular,
+  singular_,
+  snakeCase,
+} from '@src/utils/string'
 import { associationName } from '../../utils/associations'
 import {
   dataTypeToTypeScript,
@@ -156,8 +164,8 @@ function associationType({
   const sourceName = modelName(sourceModel)
   const targetName = modelName(targetModel)
   const name = associationName({ association, targetModel })
-  const singularMethodPostfix = singular(pascalCase(name))
-  const pluralMethodPostfix = plural(pascalCase(name))
+  const singularMethodPostfix = singular_(pascalCase(name))
+  const pluralMethodPostfix = plural_(pascalCase(name))
   const targetPks = targetModel.fields.filter((f) => f.primaryKey)
   const targetPkType =
     targetPks.length > 1
@@ -170,6 +178,7 @@ function associationType({
     case AssociationTypeType.BelongsTo: {
       return [
         `// ${sourceName} belongsTo ${targetName}${aliasLabel(association)}`,
+        `// Many-To-One: ${sourceName} n:1 ${targetName}`,
         `declare ${name}?: NonAttribute<${targetName}>`,
         `declare get${singularMethodPostfix}: BelongsToGetAssociationMixin<${targetName}>`,
         `declare set${singularMethodPostfix}: BelongsToSetAssociationMixin<${targetName}, ${targetPkType}>`,
@@ -188,6 +197,7 @@ function associationType({
 
       return [
         `// ${sourceName} hasMany ${targetName}${aliasLabel(association)}`,
+        `// One-To-Many: ${sourceName} 1:n ${targetName}`,
         `declare ${name}?: NonAttribute<${targetName}[]>`,
         `declare get${pluralMethodPostfix}: HasManyGetAssociationsMixin<${targetName}>`,
         `declare set${pluralMethodPostfix}: HasManySetAssociationsMixin<${targetName}, ${targetPkType}>`,
@@ -205,6 +215,7 @@ function associationType({
     case AssociationTypeType.HasOne: {
       return [
         `// ${sourceName} hasOne ${targetName}${aliasLabel(association)}`,
+        `// One-To-One: ${sourceName} 1:1 ${targetName}`,
         `declare ${name}?: NonAttribute<${targetName}>`,
         `declare get${singularMethodPostfix}: HasOneGetAssociationMixin<${targetName}>`,
         `declare set${singularMethodPostfix}: HasOneSetAssociationMixin<${targetName}, ${targetPkType}>`,
@@ -215,6 +226,7 @@ function associationType({
     case AssociationTypeType.ManyToMany: {
       return [
         `// ${sourceName} belongsToMany ${targetName}${aliasLabel(association)}`,
+        `// Many-to-Many: ${sourceName} m:n ${targetName}`,
         `declare ${name}?: NonAttribute<${targetName}[]>`,
         `declare get${pluralMethodPostfix}: BelongsToManyGetAssociationsMixin<${targetName}>`,
         `declare set${pluralMethodPostfix}: BelongsToManySetAssociationsMixin<${targetName}, ${targetPkType}>`,
@@ -233,7 +245,8 @@ function associationType({
 }
 
 function aliasLabel({ alias }: Association): string {
-  return alias ? ` (as ${pascalCase(alias)})` : ''
+  return alias ? ` (as ${alias})` : ''
+  // return alias ? ` (as ${pascalCase(alias)})` : ''
 }
 
 type TableNameArgs = {
