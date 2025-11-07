@@ -22,6 +22,7 @@ import {
   NAME_TOO_LONG_MESSAGE,
   NAME_UNIQUE_MESSAGE,
   NAME_WITH_NUMBER_MESSAGE,
+  NAME_WITH_SPECIAL_CHAR_MESSAGE,
 } from './messages'
 
 // TODO: Unit tests
@@ -122,6 +123,10 @@ function validateModelName(model: Model, schema: Schema): string | undefined {
     return NAME_WITH_NUMBER_MESSAGE
   }
 
+  if (!InputFilters.modelInfo(model.name)) {
+    return NAME_WITH_SPECIAL_CHAR_MESSAGE
+  }
+
   if (findDuplicateModel(model, schema)) {
     return NAME_UNIQUE_MESSAGE
   }
@@ -151,6 +156,10 @@ function validateFieldName(field: Field, model: Model): string | undefined {
 
   if (nameStartsWithNumber(field.name)) {
     return NAME_WITH_NUMBER_MESSAGE
+  }
+
+  if (!InputFilters.modelInfo(field.name)) {
+    return NAME_WITH_SPECIAL_CHAR_MESSAGE
   }
 
   if (findDuplicateField(field, model)) {
@@ -194,6 +203,10 @@ function validateAssociationAlias(
     return NAME_WITH_NUMBER_MESSAGE
   }
 
+  if (association.alias && !InputFilters.modelInfo(association.alias)) {
+    return NAME_WITH_SPECIAL_CHAR_MESSAGE
+  }
+
   if (findDuplicateAssociationName(association, model, schema)) {
     return NAME_UNIQUE_MESSAGE
   }
@@ -207,6 +220,10 @@ function validateAssociationForeignKey(association: Association): string | undef
   if (nameStartsWithNumber(association.foreignKey)) {
     return NAME_WITH_NUMBER_MESSAGE
   }
+
+  if (association.foreignKey && !InputFilters.modelInfo(association.foreignKey)) {
+    return NAME_WITH_SPECIAL_CHAR_MESSAGE
+  }
 }
 
 function validateAssociationTargetForeignKey(association: Association): string | undefined {
@@ -217,6 +234,10 @@ function validateAssociationTargetForeignKey(association: Association): string |
 
     if (nameStartsWithNumber(association.type.targetFk)) {
       return NAME_WITH_NUMBER_MESSAGE
+    }
+
+    if (association.type.targetFk && !InputFilters.modelInfo(association.type.targetFk)) {
+      return NAME_WITH_SPECIAL_CHAR_MESSAGE
     }
   }
 }
@@ -236,6 +257,10 @@ function validateAssociationThroughTable(association: Association): string | und
 
     if (nameStartsWithNumber(association.type.through.table)) {
       return NAME_WITH_NUMBER_MESSAGE
+    }
+
+    if (!InputFilters.modelInfo(association.type.through.table)) {
+      return NAME_WITH_SPECIAL_CHAR_MESSAGE
     }
   }
 }
@@ -272,3 +297,56 @@ function findDuplicateAssociationName(
     })
   })
 }
+
+export const InputFilters = {
+  integer: (value: string, fix = false): boolean | string => {
+    if (fix) return value.replace(/[^-?\d]/g, '')
+    return /^-?\d*$/.test(value)
+  },
+
+  unsignedInteger: (value: string, fix = false): boolean | string => {
+    if (fix) return value.replace(/\D/g, '')
+    return /^\d*$/.test(value)
+  },
+
+  limitedInteger:
+    (max: number) =>
+    (value: string, fix = false): boolean | string => {
+      if (fix) {
+        const cleaned = value.replace(/\D/g, '')
+        const num = parseInt(cleaned || '0', 10)
+        return num > max ? String(max) : cleaned
+      }
+      return /^\d*$/.test(value) && (value === '' || parseInt(value) <= max)
+    },
+
+  float: (value: string, fix = false): boolean | string => {
+    if (fix) return value.replace(/[^0-9.,-]/g, '')
+    return /^-?\d*[.,]?\d*$/.test(value)
+  },
+
+  currency: (value: string, fix = false): boolean | string => {
+    if (fix) return value.replace(/[^0-9.,-]/g, '').replace(/([.,]\d{2})\d+/g, '$1') // chỉ giữ 2 số thập phân
+    return /^-?\d*[.,]?\d{0,2}$/.test(value)
+  },
+
+  latin: (value: string, fix = false): boolean | string => {
+    if (fix) return value.replace(/[^a-zA-Z]/g, '')
+    return /^[a-zA-Z]*$/i.test(value)
+  },
+
+  hex: (value: string, fix = false): boolean | string => {
+    if (fix) return value.replace(/[^0-9a-fA-F]/g, '')
+    return /^[0-9a-f]*$/i.test(value)
+  },
+
+  nonWhitespace: (value: string, fix = false): boolean | string => {
+    if (fix) return value.replace(/[^a-zA-Z0-9_-]/g, '').replace(/^[^a-zA-Z]+/, '')
+    return /^[a-zA-Z][a-zA-Z0-9_-]*$/i.test(value)
+  },
+
+  modelInfo: (value: string, fix = false): boolean | string => {
+    if (fix) return value.replace(/[^a-zA-Z0-9_]/g, '').replace(/^[^a-zA-Z]+/, '')
+    return /^[a-zA-Z][a-zA-Z0-9_]*$/i.test(value)
+  },
+} as const

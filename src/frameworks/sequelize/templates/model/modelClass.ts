@@ -241,8 +241,8 @@ type TableNameArgs = {
   dbOptions: DbOptions
 }
 function tableName({ dbOptions: { caseStyle, nounForm }, model }: TableNameArgs): string | null {
-  if (model.tableName) return `tableName: '${model.tableName}'`
   let tableName = model.name
+  if (model.tableName) tableName = model.tableName
   if (caseStyle === DbCaseStyle.Snake) {
     tableName = snakeCase(tableName)
   }
@@ -251,5 +251,5 @@ function tableName({ dbOptions: { caseStyle, nounForm }, model }: TableNameArgs)
   } else {
     tableName = plural(tableName)
   }
-  return `tableName: '${tableName}'`
+  return `tableName: '${tableName.replace(/ /g, '_').replace(/[^a-zA-Z0-9_]/g, '')}'`
 }
